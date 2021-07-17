@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ezen.samsamoo.dao.SamFileDao">
+
+ 	<!-- 업로드된 파일의 메타정보를 DB에 저장 -->
+    <insert id="saveMeta" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO samFile
+        SET regDate = NOW(),
+        updateDate = NOW(),
+        relTypeCode
+        = #{relTypeCode},
+        relId = #{relId},
+        typeCode = #{typeCode},
+        type2Code =
+        #{type2Code},
+        fileNo = #{fileNo},
+        originFileName = #{originFileName},
+        fileExtTypeCode = #{fileExtTypeCode},
+        fileExtType2Code =
+        #{fileExtType2Code},
+        fileSize = #{fileSize},
+        fileDir = #{fileDir},
+        fileExt = #{fileExt}
+    </insert>
+
+
+	<!-- 파일 데이터 가지고 오기 -->
+    <select id="getSamFile" resultType="SamFile">
+        SELECT *
+        FROM samFile
+        WHERE 1
+        <if test="relTypeCode != null">
+            AND relTypeCode = #{relTypeCode}
+        </if>
+        <if test="relId != null">
+            AND relId = #{relId}
+        </if>
+        <if test="typeCode != null">
+            AND typeCode = #{typeCode}
+        </if>
+        <if test="type2Code != null">
+            AND type2Code = #{type2Code}
+        </if>
+        <if test="fileNo != null">
+            AND fileNo = #{fileNo}
+        </if>
+    </select>
+   
+   
+	<!-- 파일 번호를 이용해 파일 데이터 가지고 오기 --> 
+    <select id="getSamFileById" resultType="SamFile">
+        SELECT *
+        FROM samFile
+        WHERE 1
+        AND id = #{id}
+    </select>
+     
+   
+	<!-- 파일들 여러 개 가지고 오기 -->  
+     <select id="getSamFiles" resultType="SamFile">
+        SELECT *
+        FROM samFile
+        WHERE 1
+        AND relTypeCode = #{relTypeCode}
+        AND relId =
+        #{relId}
+        <if test="typeCode != null">
+            AND typeCode = #{typeCode}
+        </if>
+        <if test="type2Code != null">
+            AND type2Code = #{type2Code}
+        </if>
+        ORDER BY typeCode, type2Code, fileNo
+    </select>
+    
+    
+    <!-- 관련타입코드와 관련 데이터 번호를 이용해 파일들 여러 개 가지고 오기  -->
+    <select id="getSamFilesByRelTypeCodeAndRelId" resultType="SamFile">
+        SELECT *
+        FROM samFile
+        WHERE 1
+        AND relTypeCode = #{relTypeCode}
+        AND relId = #{relId}
+        ORDER BY typeCode, type2Code, fileNo
+    </select>
+    
+
+<!-- 관련 데이터 번호(번호들 리스트에 담음)를 이용해서 파일들 가지고 오기 -->
+<!-- foreach 사용법 -->
+<!-- item: 전달받은 인자 값 / index: 반복되는 구문 번호. 0부터 순차적으로 증가-->
+<!-- collection: 전달받은 인자. List형태나 Array형태 / open: 구문이 시작될 때 삽입할 문자열 / close: 구문이 종료될 때 삽입할 문자열 -->
+    <select
+            id="getSamFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code"
+            resultType="SamFile">
+        SELECT *
+        FROM samFile
+        WHERE 1
+        <if test="relIds != null and relIds.size > 0">
+            AND relId IN
+            <foreach item="relId" index="index" collection="relIds"
+                     open="(" separator="," close=")">
+                #{relId}
+            </foreach>
+        </if>
+        AND relTypeCode = #{relTypeCode}
+        AND typeCode = #{typeCode}
+        AND type2Code = #{type2Code}
+        ORDER BY relId, fileNo
+    </select>
+
+
+	<!-- 관련 데이터번호 바꾸기 -->
+    <update id="changeRelId">
+        UPDATE samFile
+        <set>
+            updateDate = NOW(),
+            relId = #{relId}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+	
+	<!-- 파일 삭제하기 -->
+    <delete id="deleteFiles">
+        DELETE FROM samFile
+        WHERE relTypeCode = #{relTypeCode}
+        AND relId = #{relId}
+    </delete>
+
+
+	<!-- 파일들 삭제하기 -->
+    <delete id="deleteFile">
+        DELETE FROM samFile
+        WHERE id = #{id}
+    </delete>
+</mapper>
+

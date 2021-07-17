@@ -1,0 +1,37 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<br />
+
+
+<footer>
+	<br />
+	<br />
+	<div class="jumbotron text-center" style="margin-bottom: 0,">
+		<p>📞010-1111-2222</p>
+		<p>📧 3355Project@example.com</p>
+		<p>🏴경기도 안양시 만안구 이젠컴퓨터</p>
+		<p>⚽조원들: 곽태신 신정민 박진현 김지연 김정진 진태호</p>
+	</div>
+	<br />
+	<div>
+		<div class="copyright">
+			&copy; Copyright
+			<strong style="color: #1EA4FF">
+				<span>3355</span>
+			</strong>
+			. All Rights Reserved
+		</div>
+		<div class="credits">
+			created by <a href="#">4조</a>
+		</div>
+	</div>
+	<br />
+</footer>
+
+
+
+
+</body>
+</html>

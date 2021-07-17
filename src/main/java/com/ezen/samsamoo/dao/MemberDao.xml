@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ezen.samsamoo.dao.MemberDao">
+
+<!-- 로그인 아이디를 통해 회원 한 명의 데이터 얻기 -->
+    <select id="getMemberByLoginId" resultType="Member">
+        SELECT *
+        FROM `member` AS M
+        WHERE M.loginId = #{loginId}
+        AND M.delStatus = 0
+    </select>
+
+
+<!-- member 번호를 통해 회원 한 명의 데이터 얻기 -->
+    <select id="getMemberById" resultType="Member">
+        SELECT *
+        FROM `member` AS M
+        WHERE M.id = #{id}
+        AND M.delStatus = 0
+    </select>
+    
+    
+<!-- 회원 이름과 이메일을 통해 회원 한명의 데이터 얻기 -->
+    <select id="getMemberByNameAndEmail" resultType="Member">
+        SELECT *
+        FROM `member` AS M
+        WHERE M.name = #{name}
+        AND M.email = #{email}
+        AND M.delStatus = 0
+    </select>
+    
+    
+<!-- 회원들의 자세한 정보 리스트를 얻기 -->
+    <select id="getForPrintMembers" resultType="Member">
+        SELECT *
+        FROM `member` AS M
+        WHERE M.delStatus = 0
+        ORDER BY M.id DESC
+    </select>
+
+
+<!-- 회원가입하기 -->
+    <insert id="join">
+        INSERT INTO `member`
+        SET regDate = NOW(),
+        updateDate = NOW(),
+        loginId = #{loginId},
+        loginPw = #{loginPw},
+        name = #{name},
+        nickname = #{nickname},
+        cellphoneNo = #{cellphoneNo},
+        email = #{email}
+    </insert>
+
+
+<!-- 회원수정하기 -->
+    <update id="modify">
+        UPDATE `member`
+        <set>
+            updateDate = NOW(),
+            <if test="loginPw != null">
+                loginPw = #{loginPw},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="cellphoneNo != null">
+                cellphoneNo = #{cellphoneNo},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+ 
+ 
+<!-- insert 이후 데이터가 들어가 auto_increment로 되어있는 PK값을 가져오기   -->
+    <select id="getLastInsertId" resultType="int">
+        SELECT LAST_INSERT_ID()
+    </select>  
+</mapper>

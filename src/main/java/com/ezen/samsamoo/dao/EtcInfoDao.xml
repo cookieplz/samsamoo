@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ezen.samsamoo.dao.EtcInfoDao">
+
+<!--<![CDATA 이거 사용하는 이유는 부등호, 앤드, or 등을 닫는 부등호가 아니라 문자열로 처리하기 위해서 -->
+
+<!-- relId, relTypeCode, typeCode, type2Code, expireDate를 이용해 기타 정보들을 가져오기 -->
+    <select id="get" resultType="EtcInfo">
+        <![CDATA[
+		SELECT *
+		FROM etcInfo
+		WHERE relId = #{relId}
+		AND relTypeCode = #{relTypeCode}
+		AND typeCode = #{typeCode}
+		AND type2Code = #{type2Code}
+		AND (expireDate >= NOW() OR expireDate IS NULL)
+		 ]]>
+    </select>
+
+
+<!-- relId, relTypeCode, typeCode, type2Code, expireDate를 이용해 밸류값을 가져오기 -->
+    <select id="getValue" resultType="String">
+        <![CDATA[
+		SELECT value
+		FROM etcInfo
+		WHERE relId = #{relId}
+		AND relTypeCode = #{relTypeCode}
+		AND typeCode = #{typeCode}
+		AND type2Code = #{type2Code}
+		AND (expireDate >= NOW() OR expireDate IS NULL)
+		 ]]>
+    </select>
+
+
+<!-- relId, relTypeCode, typeCode, type2Code, expireDate을 etcInfo 객체에 저장하기 -->
+    <insert id="setValue">
+        INSERT INTO etcInfo (regDate, updateDate, `relTypeCode`, `relId`, `typeCode`, `type2Code`, `value`, expireDate)
+        VALUES (NOW(), NOW(), #{relTypeCode}, #{relId}, #{typeCode}, #{type2Code}, #{value}, #{expireDate})
+        ON DUPLICATE KEY UPDATE
+        updateDate = NOW() , `value` = #{value}, expireDate = #{expireDate}
+    </insert>
+
+
+<!-- relId, relTypeCode, typeCode, type2Code, expireDate을 이용해 데이터 삭제하기 -->
+    <delete id="remove">
+        DELETE FROM etcInfo
+        WHERE relId = #{relId}
+        AND relTypeCode = #{relTypeCode}
+        AND typeCode = #{typeCode}
+        AND type2Code = #{type2Code}
+    </delete>
+
+</mapper>

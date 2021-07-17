@@ -1,0 +1,125 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="../../common/head.jspf"%>
+<header class="top-bar top-bar--fly">
+    <div class="container mx-auto flex h-full">
+        <a href="/" class="px-3 flex items-center">
+            <span>
+                <i class="fas fa-lemon"></i>
+            </span>
+            <span class="hidden sm:block">&nbsp;INSTA</span>
+        </a>
+
+        <div class="flex-grow"></div>
+
+        <nav class="menu-box-1">
+            <ul class="flex h-full">
+                <c:if test="${rq.logined && rq.needToChangePassword}">
+                <li class="text-red-400">
+                    <a href="../member/checkPassword?afterUri=..%2Fmember%2Fmodify" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="fas fa-home"></i>
+                        </span>
+                        <span class="hidden sm:block">&nbsp;CHANGE PASSWORD</span>
+                    </a>
+                </li>
+                </c:if>
+                <c:if test="${rq.admin}">
+                <li>
+                    <a href="/mpaAdm" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="fas fa-tachometer-alt"></i>
+                        </span>
+                        <span class="hidden sm:block">&nbsp;ADMIN HOME</span>
+                    </a>
+                </li>
+                </c:if>
+                <li>
+                    <a href="/" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="fas fa-home"></i>
+                        </span>
+                        <span class="hidden sm:block">&nbsp;HOME</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="far fa-newspaper"></i>
+                        </span>
+                        <span class="hidden md:block">&nbsp;BOARD</span>
+                    </a>
+                    <div>
+                        <h1>
+                            <a href="#">
+                                <span>
+                                    <i class="far fa-newspaper"></i>
+                                </span>
+                                <span>&nbsp;BOARD</span>
+                            </a>
+                        </h1>
+                        <ul>
+                            <li>
+                                <a href="../article/list?boardId=1">
+                                    <span>
+                                        <i class="far fa-clipboard"></i>
+                                    </span>
+                                    <span>&nbsp;NOTICE</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../article/list?boardId=2">
+                                    <span>
+                                        <i class="far fa-clipboard"></i>
+                                    </span>
+                                    <span>&nbsp;FREE</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <c:if test="${rq.logined}">
+                <li>
+                    <a href="../member/doLogout" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="fas fa-sign-out-alt"></i>
+                        </span>
+                        <span class="hidden md:block">&nbsp;LOGOUT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../member/mypage" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="fas fa-sign-out-alt"></i>
+                        </span>
+                        <span class="hidden md:block">&nbsp;${rq.loginedMember.nickname}＇s MY PAGE</span>
+                    </a>
+                </li>
+                </c:if>
+                <c:if test="${rq.notLogined}">
+                <li>
+                    <a href="${rq.loginPageUri}" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="fas fa-sign-in-alt"></i>
+                        </span>
+                        <span class="hidden md:block">&nbsp;LOGIN</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../member/join" class="h-full flex items-center px-5">
+                        <span>
+                            <i class="fas fa-sign-in-alt"></i>
+                        </span>
+                        <span class="hidden md:block">&nbsp;JOIN</span>
+                    </a>
+                </li>
+                </c:if>
+            </ul>
+        </nav>
+    </div>
+</header>
+<div class="title-bar px-3">
+    <div class="mx-auto container">
+        ${pageTitle}
+    </div>
+</div>

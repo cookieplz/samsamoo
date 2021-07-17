@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ezen.samsamoo.dao.ArticleDao">
+
+<!--게시판 번호(id)를 통해 게시판 한 개의 정보를 가져오기 -->
+    <select id="getBoardById" resultType="Board">
+        SELECT *
+        FROM board AS B
+        WHERE B.id = #{id}
+        AND B.delStatus = 0
+    </select>
+
+
+<!-- 게시글 번호(id)를 통해 게시글 한 개를 가져오기 -->
+    <select id="getArticleById" resultType="Article">
+        SELECT *
+        FROM article AS A
+        WHERE A.id = #{id}
+        AND A.delStatus = 0
+    </select>
+
+
+<!-- 게시글 번호(id)를 통해 게시글 한 개의 자세한 정보를 가져오기 -->
+    <select id="getForPrintArticleById" resultType="Article">
+        SELECT A.*,
+        IFNULL(M.nickname, "삭제된_회원") AS extra__writerName,
+        IFNULL(M.name, "삭제된_회원") AS extra__writerRealName
+        FROM article AS A
+        LEFT JOIN member AS M
+        ON A.memberId = M.id
+        WHERE A.id = #{id}
+        AND A.delStatus = 0
+    </select>
+
+
+<!-- 게시판 내의 전체 게시글의 개수를 가져오기 -->
+    <select id="getArticlesTotalCount" resultType="int">
+        SELECT COUNT(*) AS cnt
+        FROM article AS A
+        WHERE A.boardId = #{boardId}
+        <if test="searchKeyword != null">
+            <if test="searchKeywordTypeCode == 'titleAndBody'">
+                AND (
+                A.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                OR
+                A.body LIKE CONCAT('%', #{searchKeyword}, '%')
+                )
+            </if>
+            <if test="searchKeywordTypeCode == 'title'">
+                AND A.title LIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+            <if test="searchKeywordTypeCode == 'body'">
+                AND A.body LIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+        </if>
+        AND A.delStatus = 0
+    </select>
+
+
+<!-- 게시글들의 자세한 정보를 가져오기 -->
+<!-- 하단에 있는 resultMap 참조하삼 -->
+<!-- 다대다 매핑을 위해 resultMap -->
+    <select id="getForPrintArticles" resultMap="article">
+        SELECT A.*,
+        IFNULL(M.nickname, "삭제된_회원") AS extra__writerName,	<!-- 삭제 회원의 닉네임 -->
+        IFNULL(M.name, "삭제된_회원") AS extra__writerRealName <!-- 삭제 회원의 실명 -->
+        FROM article AS A
+        LEFT JOIN member AS M
+        ON A.memberId = M.id
+        WHERE A.boardId = #{boardId}
+        <if test="searchKeyword != null">
+            <if test="searchKeywordTypeCode == 'titleAndBody'">
+                AND (
+                A.title LIKE CONCAT('%', #{searchKeyword}, '%')
+                OR
+                A.body LIKE CONCAT('%', #{searchKeyword}, '%')
+                )
+            </if>
+            <if test="searchKeywordTypeCode == 'title'">
+                AND A.title LIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+            <if test="searchKeywordTypeCode == 'body'">
+                AND A.body LIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+        </if>
+        ORDER BY A.id DESC
+        LIMIT #{limitFrom}, #{limitTake};
+    </select>
+
+
+<!-- 게시글 쓰기 -->
+    <insert id="writeArticle">
+        INSERT INTO article
+        SET regDate = NOW(),
+        updateDate =
+        NOW(),
+        boardId = #{boardId},
+        memberId = #{memberId},
+        title = #{title},
+        body = #{body}
+    </insert>
+
+
+<!-- 게시글 수정하기 -->
+ <update id="modifyArticle">
+        UPDATE article
+        SET updateDate = NOW(),
+        title =
+        #{title},
+        body = #{body}
+        WHERE id = #{id}
+    </update>
+
+
+<!-- 게시글 삭제하기  -->
+    <update id="deleteArticleById">
+        UPDATE article
+        SET delStatus = 1,
+        delDate = NOW()
+        WHERE
+        id = #{id}
+    </update>
+
+<!-- insert 이후 데이터가 들어가 auto_increment로 되어있는 PK값을 가져오기  -->
+    <select id="getLastInsertId" resultType="int">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+
+<!-- resultMap은 myBatis에서 제공하는 자동 매핑으로 해결이 어려운 경우를 위해 구조를 설계할 수 있도록 만들어진 도구-->
+<!--  DB 조회 결과를 복잡한 객체 구조로 변환해야 할 때 사용한다-->
+<!-- 해당 쿼리의 컬럼 데이터를 클래스의 어떤 속성값으로 넣어줄 것이냐를 명시 -->
+<!-- Database 에서 select 절을 이용해 데이터를 조회할 때 mybatis의 resultMap을 이용하면 사용자가 정의한 Model 객체로 값을 직접 받아올 수 있다. -->
+<!-- association: 1대1 매핑할 때 사용-->
+    <resultMap type="Article" id="article">
+        <id property="id" column="id"/>
+        <id property="regDate" column="regDate"/>
+        <id property="updateDate" column="updateDate"/>
+        <id property="delDate" column="delDate"/>
+        <id property="delStatus" column="delStatus"/>
+        <id property="title" column="title"/>
+        <id property="body" column="body"/>
+        <id property="memberId" column="memberId"/>
+        <id property="boardId" column="boardId"/>
+        <id property="extra__writerName" column="extra__writerName"/>
+
+<!--  extra 객체에 writerName과 writerRealName을 다 때려넣음 -->
+<!-- 따라서 나중에 extra.get("writerName) 이런식으로 꺼내서 쓸 수 있는 것임 -->
+        <association property="extra" javaType="map">
+            <id property="writerName" column="extra__writerName"/>
+            <id property="writerRealName" column="extra__writerRealName"/>
+        </association>
+    </resultMap>
+
+</mapper>
+
+
