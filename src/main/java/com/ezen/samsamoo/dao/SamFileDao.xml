@@ -87,13 +87,11 @@
     </select>
     
 
-<!-- 관련 데이터 번호(번호들 리스트에 담음)를 이용해서 파일들 가지고 오기 -->
+<!-- 관련 타입 코드, 관련 데이터 번호, 타입코드, 타입2코드를 이용해서 파일들 가지고 오기 -->
 <!-- foreach 사용법 -->
 <!-- item: 전달받은 인자 값 / index: 반복되는 구문 번호. 0부터 순차적으로 증가-->
 <!-- collection: 전달받은 인자. List형태나 Array형태 / open: 구문이 시작될 때 삽입할 문자열 / close: 구문이 종료될 때 삽입할 문자열 -->
-    <select
-            id="getSamFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code"
-            resultType="SamFile">
+    <select id="getSamFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code"  resultType="SamFile">
         SELECT *
         FROM samFile
         WHERE 1

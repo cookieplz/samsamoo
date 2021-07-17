@@ -28,7 +28,7 @@ public interface SamFileDao {
     // 관련타입코드와 관련 데이터 번호를 이용해 파일들 여러 개 가지고 오기
     List<SamFile> getSamFilesByRelTypeCodeAndRelId(@Param("relTypeCode") String relTypeCode, @Param("relId") int relId);
     
-    // 관련 데이터 번호(번호들 리스트에 담음)를 이용해서 파일들 가지고 오기
+    // 관련 타입 코드, 관련 데이터 번호, 타입코드, 타입2코드를 이용해서 파일들 가지고 오기( dao.xml에서 쿼리 보면 쉽게 이해할 수 있음)
     List<SamFile> getSamFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code(@Param("relTypeCode") String relTypeCode,
                                                                          @Param("relIds") List<Integer> relIds, @Param("typeCode") String typeCode,
                                                                          @Param("type2Code") String type2Code);

@@ -10,29 +10,31 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- daisyui 테일윈드 -->
+<!-- daisyui  테일윈드-->
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/daisyui@0.14.4/dist/full.css">
 
-<!-- 폰트어썸 불러오기 -->
+<!-- 폰트어썸 -->
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
 
 <!-- 제이쿼리 -->
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
 
 <!-- 썸머노트 -->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 
+<!-- 커스텀 css -->
 <link rel="stylesheet" href="/resource/common.css" />
 <script src="/resource/common.js" defer></script>
-<title>INSTA</title>
+<title>3355</title>
+
+
 
 <script>
 const param = ${rq.paramJsonStr};
 </script>
 </head>
 <body>
-	<div class="site-wrap">
+	<div class="site-wrap" >

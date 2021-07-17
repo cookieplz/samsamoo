@@ -45,6 +45,7 @@ public class SamFileService {
     }
 
     
+//----------------------------------------------------------------------------------------------------     
     // 업로드된 파일을 서버의 특정 위치에 올바른 파일명으로 저장하기
     public ResultData save(MultipartFile multipartFile, String relTypeCode, int relId, String typeCode, String type2Code, int fileNo) {
         String fileInputName = multipartFile.getName();
@@ -55,7 +56,6 @@ public class SamFileService {
         }
 
         int fileSize = (int) multipartFile.getSize();
-
         if (fileSize <= 0) {
             return new ResultData("F-2", "파일이 업로드 되지 않았습니다.");
         }
@@ -72,10 +72,9 @@ public class SamFileService {
         }
 
         String fileDir = Util.getNowYearMonthDateStr();
-
+        
         if (relId > 0) {
             SamFile oldSamFile = getSamFile(relTypeCode, relId, typeCode, type2Code, fileNo);
-
             if (oldSamFile != null) {
                 deleteSamFile(oldSamFile);
             }
@@ -83,6 +82,7 @@ public class SamFileService {
 
         ResultData saveMetaRd = saveMeta(relTypeCode, relId, typeCode, type2Code, fileNo, originFileName,
                 fileExtTypeCode, fileExtType2Code, fileExt, fileSize, fileDir);
+        
         int newSamFileId = (int) saveMetaRd.getBody().get("id");
 
         // 새 파일이 저장될 폴더(io파일) 객체 생성
@@ -109,9 +109,10 @@ public class SamFileService {
     }
 
     
-//----------------------------------------------------------------------------------------------------           
+//----------------------------------------------------------------------------------------------------  
+    // 파일 저장
     public ResultData save(MultipartFile multipartFile) {
-        String fileInputName = multipartFile.getName();
+    	String fileInputName = multipartFile.getName();
         String[] fileInputNameBits = fileInputName.split("__");
 
         String relTypeCode = fileInputNameBits[1];
@@ -123,7 +124,7 @@ public class SamFileService {
         return save(multipartFile, relTypeCode, relId, typeCode, type2Code, fileNo);
     }
 
-    //
+    // 파일 저장
     public ResultData save(MultipartFile multipartFile, int relId) {
         String fileInputName = multipartFile.getName();
         String[] fileInputNameBits = fileInputName.split("__");
@@ -137,73 +138,111 @@ public class SamFileService {
     }
     
     
-//----------------------------------------------------------------------------------------------------     
-   // 파일 리스트 가져오기
-    public List<SamFile> getSamFiles(String relTypeCode, int relId, String typeCode, String type2Code) {
-        return samFileDao.getSamFiles(relTypeCode, relId, typeCode, type2Code);
-    }
+//----------------------------------------------------------------------------------------------------         
+    //	파일 여러개 한 번에 저장
+     public ResultData saveFiles(Map<String, Object> param, MultipartRequest multipartRequest) {
+         // 업로드 시작
+         Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
 
+         Map<String, ResultData> filesResultData = new HashMap<>();
+         List<Integer> samFileIds = new ArrayList<>();
+
+         for (String fileInputName : fileMap.keySet()) {
+             MultipartFile multipartFile = fileMap.get(fileInputName);
+
+             if (multipartFile.isEmpty() == false) {
+                 ResultData fileResultData = save(multipartFile);
+                 int samFileId = (int) fileResultData.getBody().get("id");
+                 samFileIds.add(samFileId);
+
+                 filesResultData.put(fileInputName, fileResultData);
+             }
+         }
+
+         String samFileIdsStr = Joiner.on(",").join(samFileIds);
+
+         // 삭제 시작
+         int deleteCount = 0;
+
+         for (String inputName : param.keySet()) {
+             String[] inputNameBits = inputName.split("__");
+
+             if (inputNameBits[0].equals("deleteFile")) {
+                 String relTypeCode = inputNameBits[1];
+                 int relId = Integer.parseInt(inputNameBits[2]);
+                 String typeCode = inputNameBits[3];
+                 String type2Code = inputNameBits[4];
+                 int fileNo = Integer.parseInt(inputNameBits[5]);
+
+                 SamFile oldSamFile = getSamFile(relTypeCode, relId, typeCode, type2Code, fileNo);
+
+                 if (oldSamFile != null) {
+                     deleteSamFile(oldSamFile);
+                     deleteCount++;
+                 }
+             }
+         }
+
+         return new ResultData("S-1", "파일을 업로드하였습니다.", "filesResultData", filesResultData, "samFileIdsStr",
+                 samFileIdsStr, "deleteCount", deleteCount);
+     }
     
+        
+//----------------------------------------------------------------------------------------------------     
     // 파일 한 개 가져오기
     public SamFile getSamFile(String relTypeCode, int relId, String typeCode, String type2Code, int fileNo) {
         return samFileDao.getSamFile(relTypeCode, relId, typeCode, type2Code, fileNo);
     }
 
     
-//----------------------------------------------------------------------------------------------------         
-    public ResultData saveFiles(Map<String, Object> param, MultipartRequest multipartRequest) {
-        // 업로드 시작
-        Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+ // 파일 리스트 가져오기
+    public List<SamFile> getSamFiles(String relTypeCode, int relId, String typeCode, String type2Code) {
+        return samFileDao.getSamFiles(relTypeCode, relId, typeCode, type2Code);
+    }    
+    
 
-        Map<String, ResultData> filesResultData = new HashMap<>();
-        List<Integer> samFileIds = new ArrayList<>();
-
-        for (String fileInputName : fileMap.keySet()) {
-            MultipartFile multipartFile = fileMap.get(fileInputName);
-
-            if (multipartFile.isEmpty() == false) {
-                ResultData fileResultData = save(multipartFile);
-                int samFileId = (int) fileResultData.getBody().get("id");
-                samFileIds.add(samFileId);
-
-                filesResultData.put(fileInputName, fileResultData);
-            }
-        }
-
-        String samFileIdsStr = Joiner.on(",").join(samFileIds);
-
-        // 삭제 시작
-        int deleteCount = 0;
-
-        for (String inputName : param.keySet()) {
-            String[] inputNameBits = inputName.split("__");
-
-            if (inputNameBits[0].equals("deleteFile")) {
-                String relTypeCode = inputNameBits[1];
-                int relId = Integer.parseInt(inputNameBits[2]);
-                String typeCode = inputNameBits[3];
-                String type2Code = inputNameBits[4];
-                int fileNo = Integer.parseInt(inputNameBits[5]);
-
-                SamFile oldSamFile = getSamFile(relTypeCode, relId, typeCode, type2Code, fileNo);
-
-                if (oldSamFile != null) {
-                    deleteSamFile(oldSamFile);
-                    deleteCount++;
-                }
-            }
-        }
-
-        return new ResultData("S-1", "파일을 업로드하였습니다.", "filesResultData", filesResultData, "samFileIdsStr",
-                samFileIdsStr, "deleteCount", deleteCount);
-    }
-
-    //
+//----------------------------------------------------------------------------------------------------
+    // 관련 데이터 번호 바꾸기
     public void changeRelId(int id, int relId) {
         samFileDao.changeRelId(id, relId);
     }
 
-    //
+    
+    // 관련 데이터 번호 바꾸기
+    // 파일이 먼저 생성된 후에, 관련 데이터가 생성되는 경우에는, file의 관련 데이터 번호(relId)가 일단 0으로 저장된다.
+    // 그것을 뒤늦게라도 이렇게 고쳐야 한다.
+    public void changeInputFileRelIds(Map<String, Object> param, int id) {
+        String samFileIdsStr = Util.ifEmpty((String) param.get("samFileIdsStr"), null);
+
+        if (samFileIdsStr != null) {
+            List<Integer> samFileIds = Util.getListDividedBy(samFileIdsStr, ",");
+
+            for (int samFileId : samFileIds) {
+                changeRelId(samFileId, id);
+            }
+        }
+    }
+    
+    
+//----------------------------------------------------------------------------------------------------
+    // 파일을 삭제하는 메서드
+    private void deleteSamFile(SamFile samFile) {
+        String filePath = samFile.getFilePath(samFileDirPath);
+        Util.deleteFile(filePath);
+
+        samFileDao.deleteFile(samFile.getId());
+    }
+    
+    
+    // 파일 삭제하기(관련 타입코드, 관련 데이터 번호, 타입코드, 타입2코드, 파일번호를 이용해)
+    public void deleteSamFile(String relTypeCode, int relId, String typeCode, String type2Code, int fileNo) {
+        SamFile samFile = samFileDao.getSamFile(relTypeCode, relId, typeCode, type2Code, fileNo);
+
+        deleteSamFile(samFile);
+    }
+    
+    
+    // 파일 여러개 삭제하기
     public void deleteSamFiles(String relTypeCode, int relId) {
         List<SamFile> samFiles = samFileDao.getSamFilesByRelTypeCodeAndRelId(relTypeCode, relId);
 
@@ -211,33 +250,19 @@ public class SamFileService {
             deleteSamFile(samFile);
         }
     }
-
-    //
-    public void deleteSamFile(String relTypeCode, int relId, String typeCode, String type2Code, int fileNo) {
-        SamFile samFile = samFileDao.getSamFile(relTypeCode, relId, typeCode, type2Code, fileNo);
-
-        deleteSamFile(samFile);
-    }
-
-    // 파일 삭제하기
-    private void deleteSamFile(SamFile samFile) {
-        String filePath = samFile.getFilePath(samFileDirPath);
-        Util.deleteFile(filePath);
-
-        samFileDao.deleteFile(samFile.getId());
-    }
-
+    
+    
+//----------------------------------------------------------------------------------------------------
+    // 파일 번호를 이용하여 파일 데이터 가지고 오기
     public SamFile getSamFile(int id) {
         return samFileDao.getSamFileById(id);
     }
 
     
-    //
-    public Map<Integer, Map<String, SamFile>> getFilesMapKeyRelIdAndFileNo(String relTypeCode, List<Integer> relIds,
-                                                                           String typeCode, String type2Code) {
-        List<SamFile> samFiles = samFileDao.getSamFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code(relTypeCode, relIds,
-                typeCode, type2Code);
-        Map<String, SamFile> map = new HashMap<>();
+    /* 일단 주석. 오류발생시 주석 해제 바람
+    public Map<Integer, Map<String, SamFile>> getFilesMapKeyRelIdAndFileNo(String relTypeCode, List<Integer> relIds,  String typeCode, String type2Code) {
+        List<SamFile> samFiles = samFileDao.getSamFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code(relTypeCode, relIds, typeCode, type2Code);
+        
         Map<Integer, Map<String, SamFile>> rs = new LinkedHashMap<>();
 
         for (SamFile samFile : samFiles) {
@@ -250,21 +275,7 @@ public class SamFileService {
 
         return rs;
     }
-
-    
-    //
-    public void changeInputFileRelIds(Map<String, Object> param, int id) {
-        String samFileIdsStr = Util.ifEmpty((String) param.get("samFileIdsStr"), null);
-
-        if (samFileIdsStr != null) {
-            List<Integer> samFileIds = Util.getListDividedBy(samFileIdsStr, ",");
-
-            // 파일이 먼저 생성된 후에, 관련 데이터가 생성되는 경우에는, file의 relId가 일단 0으로 저장된다.
-            // 그것을 뒤늦게라도 이렇게 고쳐야 한다.
-            for (int samFileId : samFileIds) {
-                changeRelId(samFileId, id);
-            }
-        }
-    }
+    */
+ 
 
 }
