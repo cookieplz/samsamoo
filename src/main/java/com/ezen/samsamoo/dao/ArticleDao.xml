@@ -144,6 +144,9 @@
         <id property="delStatus" column="delStatus"/>
         <id property="title" column="title"/>
         <id property="body" column="body"/>
+        <id property="hitCount" column="hitCount"/>
+        <id property="likeCount" column="likeCount"/>
+        <id property="dislikeCount" column="dislikeCount"/>
         <id property="memberId" column="memberId"/>
         <id property="boardId" column="boardId"/>
         <id property="extra__writerName" column="extra__writerName"/>
@@ -156,6 +159,35 @@
         </association>
     </resultMap>
 
+
+<!-- 게시글 조회수 증가 -->
+<!-- public int updateHitCount(@Param("id") int id); -->
+    <update id="updateHitCount">
+        UPDATE article
+        SET hitCount = hitCount + 1
+        WHERE
+        id = #{id}
+    </update>
+    
+    
+<!-- 게시글 좋아요 증가 -->
+<!-- public int updateLikeCount(@Param("id") int id); -->
+    <update id="updateLikeCount">
+        UPDATE article
+        SET likeCount = likeCount + 1
+        WHERE
+        id = #{id}
+    </update>    
+   
+   
+<!-- 게시글 싫어요 증가 -->    
+<!-- public int updateDislikeCount(@Param("id") int id); -->   
+	<update id="updateDislikeCount">
+		UPDATE article
+		SET dislikeCount = dislikeCount + 1
+		WHERE 
+		id = #{id}
+	</update>
+
+
 </mapper>
-
-

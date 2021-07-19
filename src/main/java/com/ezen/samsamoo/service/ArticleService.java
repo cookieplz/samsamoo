@@ -113,6 +113,37 @@ public class ArticleService {
 
 	
 //----------------------------------------------------------------------------------------------------  	
+	// 게시글 조회수 1씩 증가하기
+		public ResultData updateHitCountById(int id) {
+			Article article = getArticleById(id);
+			if(isEmpty(article)) {
+				return new ResultData("F-1", "게시물이 존재하지 않습니다.", "id", id);
+			}
+			articleDao.updateHitCount(id);
+			return new ResultData("S-1", "댓글 조회수가 증가되었습니다.", "id", id);
+		}
+		
+	
+	// 게시글 좋아요 1씩 증가하기
+		public ResultData updateLikeCountById(int id) {
+			Article article = getArticleById(id);
+			if(isEmpty(article)) {
+				return new ResultData("F-1", "게시물이 존재하지 않습니다.", "id", id);
+			}
+			articleDao.updateLikeCount(id);
+			return new ResultData("S-1", "좋아요가 증가되었습니다.", "id", id);
+		}
+	
+	
+	// 게시글 싫어요 1씩 증가하기
+		public ResultData updateDislikeCountById(int id) {
+			Article article = getArticleById(id);
+			if(isEmpty(article)) {
+				return new ResultData("F-1", "게시물이 존재하지 않습니다.", "id", id);
+			}
+			articleDao.updateDislikeCount(id);
+			return new ResultData("S-1", "싫어요가 증가되었습니다.", "id", id);
+		}
 	
 
 }

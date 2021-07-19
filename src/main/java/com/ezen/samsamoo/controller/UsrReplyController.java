@@ -3,9 +3,11 @@ package com.ezen.samsamoo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ezen.samsamoo.dto.Article;
+import com.ezen.samsamoo.dto.Board;
 import com.ezen.samsamoo.dto.Reply;
 import com.ezen.samsamoo.dto.ResultData;
 import com.ezen.samsamoo.dto.Rq;
@@ -53,6 +55,7 @@ public class UsrReplyController {
 
         return Util.msgAndReplace(req, writeResultData.getMsg(), redirectUri);
     }
+    
     
 //----------------------------------------------------------------------------------------------------  
    // 답글 id를 통해 객체 얻어와서 권한 등 체크 후 답글 수정하는 페이지로 넘겨줌

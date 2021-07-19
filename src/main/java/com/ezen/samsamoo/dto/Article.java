@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -61,4 +62,12 @@ public class Article {
         return "this.src = '" + getWriterProfileFallbackImgUri() + "'";
     }
     
+	public Map<String, Object> getExtraNotNull() {
+		if ( extra == null ) {
+			extra = new HashMap<String, Object>();
+		}
+		return extra;
+	}
+	
+	
 }

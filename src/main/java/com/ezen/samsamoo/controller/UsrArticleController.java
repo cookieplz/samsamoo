@@ -1,6 +1,7 @@
 package com.ezen.samsamoo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,10 +10,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.ezen.samsamoo.dto.*;
 import com.ezen.samsamoo.service.ArticleService;
 import com.ezen.samsamoo.service.ReplyService;
+import com.ezen.samsamoo.service.SamFileService;
 import com.ezen.samsamoo.util.Util;
 
+
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UsrArticleController {
@@ -23,6 +29,8 @@ public class UsrArticleController {
     @Autowired
     private ReplyService replyService;
     
+    @Autowired
+    private SamFileService samFileService;
     
 //---------------------------------------------------------------------------------------------------- 
     // 게시물 하나의 정보를 얻어오기
@@ -69,7 +77,7 @@ public class UsrArticleController {
         req.setAttribute("totalItemsCount", totalItemsCount);
 
         // 한 페이지에 보여줄 수 있는 게시물 최대 개수
-        int itemsCountInAPage = 20;
+        int itemsCountInAPage = 5;
         // 총 페이지 수
         int totalPage = (int) Math.ceil(totalItemsCount / (double) itemsCountInAPage);
 
@@ -88,18 +96,29 @@ public class UsrArticleController {
     // 게시물 상세보기
     @RequestMapping("/usr/article/detail")
     public String showDetail(HttpServletRequest req, int id) {
+    	articleService.updateHitCountById(id);
         Article article = articleService.getForPrintArticleById(id);
         List<Reply> replies = replyService.getForPrintRepliesByRelTypeCodeAndRelId("article", id);
 
         if (article == null) {
             return Util.msgAndBack(req, id + "번 게시물이 존재하지 않습니다.");
         }
-
         Board board = articleService.getBoardById(article.getBoardId());
 
-        req.setAttribute("replies", replies);
+		List<SamFile> files = samFileService.getSamFiles("article", article.getId(), "common", "attachment");
+
+		Map<String, SamFile> filesMap = new HashMap<>();
+
+		for (SamFile file : files) {
+			filesMap.put(file.getFileNo() + "", file);
+		}	
+		article.getExtraNotNull().put("file__common__attachment", filesMap);
+		     
+      
         req.setAttribute("article", article);
         req.setAttribute("board", board);
+        req.setAttribute("replies", replies);
+        req.setAttribute("samFile", files);
 
         return "usr/article/detail";
     }

@@ -36,4 +36,21 @@ public class Reply {
         return bodyForPrint;
     }
     
+    
+    // 프로필 이미지 Uri 가지고 오기
+    public String getWriterProfileImgUri() {
+        return "/common/samFile/file/member/" + memberId + "/extra/profileImg/1";
+    }
+
+    
+    // 프사 없을 때 대체 이미지
+    public String getWriterProfileFallbackImgUri() {
+        return "/resource/img/profileNongdamgom";
+    }
+
+    // 대체 이미지를 html에 삽입하기 위한 메서드 
+    public String getWriterProfileFallbackImgOnErrorHtmlAttr() {
+        return "this.src = '" + getWriterProfileFallbackImgUri() + "'";
+    }
+    
 }

@@ -2,8 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<c:set var="pageTitle"
-	value="<span><i class='far fa-clipboard'></i></span> <span>${board.name} ARTICLE LIST</span>" />
+<c:set var="pageTitle" value="<span><i class='far fa-clipboard'></i></span> <span>${board.name} ARTICLE LIST</span>" />
 
 <%@ include file="../common/head.jspf"%>
 
@@ -87,7 +86,7 @@
 					<span>${page}</span>
 				</div>
 				<hr />
-				<div class="plain-link-wrap gap-3 flex justify-center mt-3 mb-3">
+				<div class="plain-link-wrap gap-3 flex items-left mt-3 mb-3">
 					<a href="write?boardId=${board.id}" class="plain-link">
 						<button class="btn bg-green-600 text-white active:bg-green-900 border-0  ml-6 w-28">
 							<span>
@@ -99,56 +98,82 @@
 				</div>
 				<hr />
 			</div>
-
-
+				
+			<!--  -->	
 			<div class="item-bt-1-not-last-child">
 				<c:forEach items="${articles}" var="article">
 					<c:set var="detailUri" value="../article/detail?id=${article.id}" />
-					<div class="px-4 py-8">
-
-						<div class="grid gap-3" style="grid-template-columns: 100px 1fr;">
-							<a href="${detail.Uri}"> <img class="w-full object-cover" onerror="${article.writerProfileFallbackImgOnErrorHtmlAttr}" src="${article.writerProfileImgUri}" alt="" />
-							</a>
-							<div class="m-2">
-								<a href="${detailUri }" class="no-underline cursor-pointer"> 
-									<span class="badge badge-outline">제목</span>
-									<div class="line-clamp-3">${article.title}</div>
-								</a> 
-								<a href="${degailUri }" class="no-underline cursor-pointer"> 
-									<span class="badge badge-outline">본문</span>
-									<div class="line-clamp-3">${article.body }</div>
+						<div class="px-4 py-8">
+	
+							<div class="grid gap-3" style="grid-template-columns: 100px 1fr;">
+								<a href="${detail.Uri}"> <img class=" object-cover" onerror="${article.writerProfileFallbackImgOnErrorHtmlAttr}" src="${article.writerProfileImgUri}" alt="" />
 								</a>
+								<div class="m-2">
+									<a href="${detailUri }" class="no-underline cursor-pointer"> 
+										<span class="badge badge-outline">제목</span>
+										<div class="line-clamp-3">${article.title}</div>
+									</a> 
+									<div class="likeAndHateCount mt-2">
+										<i class="fas fa-thumbs-up text-blue-500"></i>
+										<span>
+											${article.likeCount} 
+										</span>
+										<i class="fas fa-thumbs-down text-red-500 ml-2"></i>
+										${article.dislikeCount }
+									</div>
+								</div>
 							</div>
-						</div>
-
-						<div class="mt-3 grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
-							<a href="${detailUri}" class="no-underline cursor-pointer"> <span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">번호</span> <span>${article.id }</span>
-							</a> <a href="${detailUri }" class="no-underline cursor-pointer"> <span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">작성자</span> <span>${article.extra__writerName }</span>
-							</a> <a href="${detailUri}" class="no-underline cursor-pointer"> <span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">등록날짜</span> <span
-									class="text-gray-600 text-light">${article.regDate }</span>
-							</a> <a href="${detailUri}" class="no-underline cursor-pointer"> <span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">수정날짜</span> <span
-									class="text-gray-600 text-light">${article.updateDate }</span>
-							</a>
-						</div>
-					</div>
-				</c:forEach>
+	
+							<div class="mt-3 grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
+								<div class="no-underline cursor-pointer"> 
+									<span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">번호</span> 
+									<span>${article.id }</span>
+								</div>
+								<div class="no-underline cursor-pointer">
+									<span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">작성자</span>
+									 <span>${article.extra__writerName }</span>
+								</div> 
+								<div class="no-underline cursor-pointer"> 
+									<span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">등록날짜</span>
+									 <span class="text-gray-600 text-light">${article.regDate }</span>
+								</div> 
+								<div class="no-underline cursor-pointer"> 
+									<span class="badge inline-flex items-center justify-center px-2 py-1 leading-none rounded border-0 bg-gray-400">조회수</span>
+									<span>${article.hitCount}</span>
+								</div> 
+								<input type="hidden"  name="updateDate"  value="${article.updateDate}">
+							</div>
+						</div>		
+					</c:forEach>
+				</div>
 			</div>
+		</div>
+		
+		<!-- 페이징 -->
+		<hr>
+		<div class="pages mt-8 mb-8 text-center">
+			<c:set var="pageMenuArmSize" value="4" />
+			<c:set var="startPage"  value="${page - pageMenuArmSize >= 1 ? page - pageMenuArmSize : 1 }"/>	
+			<c:set var="endPage" value="${page + pageMenuArmSize <= totalPage ? page + pageMenuArmSize : totalPage }"/>
+			<c:set var= "uriBase" value="?boardId=${board.id }"/>
+			<c:set var="uriBase" value ="${uriBase}&searchKeywordType=${param.searchKeywordType }"/>
+			<c:set var="uriBase" value="${uriBase }&searchKeyword=${param.searchKeyword }"/>
+			<c:set var= "aClassStr" value="px-2 inline-block border border-gray-200 text-lg hover:bg-gray-200"/>
+			<c:if test = "${startPage > 1 }">
+				<a class="${aClassStr}"  href="${uriBase }&page=1">◀◀</a>
+				<a class="${aClassStr}"  href="${uriBase }&page=${startPage - 1}">◀</a>
+			</c:if>
+			<c:forEach var="i" begin="${startPage }" end="${endPage }">
+				<a class=" ${aClassStr} ${page == i ? 'text-red-500' : ' '}"  href="${uriBase}&page=${i}">
+					${i}
+				</a>
+			</c:forEach>
+		<c:if test="${endPage < totalPage}">
+			<a class="${aClassStr}" href="${uriBase}&page=${endPage + 1}">▶</a>
+			<a class="${aClassStr}" href="${uriBase}&page=${totalPage}">▶▶</a>
+		</c:if>
+	</div>	
+	</div>
+		
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			<%@ include file="../common/foot.jspf"%>
+<%@ include file="../common/foot.jspf"%>

@@ -19,3 +19,52 @@
 
 6. <col span="숫자">
 <col> 요소로 합쳐질 열의 개수
+
+7.	What does the "%2F" characters mean when used before an object in a URL?
+-> Its the URL Encoded value of the Forward Slash(/)
+	Special characters need to be encoded in URL's, eg. +, & , etc
+	URL 주소 중 기호 부분을 두 자리의 16 진수로 변환하여 표현. 
+	%26 -> &
+	%2F -> /
+	%3A -> :
+	%3F -> ?
+	%3D -> =
+
+ 8. var $el = $(el)
+ simple variable $el is assigend to the object $(el), 
+ $ in the variable name means nothing, just someone decided to call it. 
+ This is a variable that contains a selection of elements jQuery. 
+ $ in front of variable name for the convenience of the developer, to make it clear that it's a jQuery object.
+ 
+ 
+ 9. .closet()
+closet()는 모든 부모 요소를 대상으로하여 원하는 요소만 선택자로 가져올 수 있다. 
+예를들어 아래처럼 span 태그의 부모 요소중 div 태그를 가져올 수 있다.
+var tagName = $('span').closet('div').prop('tagName')l
+div를 출력
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

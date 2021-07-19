@@ -41,5 +41,14 @@ public interface ArticleDao {
     
     // insert 이후 데이터가 들어가 auto_increment로 되어있는 PK값을 가져오기 
     public int getLastInsertId();
+    
+    // 게시글 조회수 1씩 증가
+    public int updateHitCount(@Param("id") int id);
+    
+    // 게시글 좋아요 1씩 증가
+    public int updateLikeCount(@Param("id") int id);
+    
+    // 게시글 싫어요 1씩 증가
+    public int updateDislikeCount(@Param("id") int id);
 
 }
