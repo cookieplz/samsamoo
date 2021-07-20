@@ -264,15 +264,12 @@ public class SamFileService {
         List<SamFile> samFiles = samFileDao.getSamFilesRelTypeCodeAndRelIdsAndTypeCodeAndType2Code(relTypeCode, relIds, typeCode, type2Code);
         
         Map<Integer, Map<String, SamFile>> rs = new LinkedHashMap<>();
-
         for (SamFile samFile : samFiles) {
             if (rs.containsKey(samFile.getRelId()) == false) {
                 rs.put(samFile.getRelId(), new LinkedHashMap<>());
             }
-
             rs.get(samFile.getRelId()).put(samFile.getFileNo() + "", samFile);
         }
-
         return rs;
     }
     */

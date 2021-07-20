@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+ <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
@@ -93,8 +93,6 @@ function ReplyModify__submitForm(form) {
 
 
 
-
-
 <div class="section section-article-detail">
 	<div class="detail_container mx-auto px-2">
 		<div class="card bordered item-bt-1-not-last-child">
@@ -153,6 +151,16 @@ function ReplyModify__submitForm(form) {
 
 					<!-- 게시글 내용 -->
 
+					<div class="text-gray-400 font-medium text-sm mb-7 mt-6">
+						<c:forEach begin="1" end ="${fileInputMaxCount}" var="inputNo">
+							<c:set var="fileNo" value="${String.valueOf(inputNo)}" />
+							<c:set var="file" value="${article.extra.file__common__attachment[fileNo]}"/>
+								${file.mediaHtml }
+						</c:forEach>
+					</div>
+					<div class="text-gray-600 font-semibold text-lg mb-2">${article.title }</div>
+					<div class="gext-gray-500 font-thin text-sm mb-6">${article.body }</div>
+					<!--  
 					<div class="body-container mx-auto mt-6">
 						<div class="mt-3">
 							<c:forEach begin="1" end="${fileInputMaxCount}" var="inputNo">
@@ -161,9 +169,12 @@ function ReplyModify__submitForm(form) {
 								${file.mediaHtml}
 							</c:forEach>
 						</div>
-		
 						<div class="mt-3">${article.bodyForPrint}</div>
 					</div>
+					-->
+					
+					
+					
 				</div>
 			</div>
 

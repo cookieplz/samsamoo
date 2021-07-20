@@ -93,15 +93,14 @@
 
 
 <!-- 게시글 쓰기 -->
-    <insert id="writeArticle">
+    <insert id="writeArticle" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO article
         SET regDate = NOW(),
-        updateDate =
-        NOW(),
+        updateDate = NOW(),
         boardId = #{boardId},
         memberId = #{memberId},
         title = #{title},
-        body = #{body}
+        `body` = #{body}
     </insert>
 
 
@@ -109,8 +108,7 @@
  <update id="modifyArticle">
         UPDATE article
         SET updateDate = NOW(),
-        title =
-        #{title},
+        title = #{title},
         body = #{body}
         WHERE id = #{id}
     </update>

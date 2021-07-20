@@ -1,20 +1,29 @@
 package com.ezen.samsamoo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.ezen.samsamoo.dao.ArticleDao;
 import com.ezen.samsamoo.dto.Article;
 import com.ezen.samsamoo.dto.Board;
 import com.ezen.samsamoo.dto.ResultData;
+import com.ezen.samsamoo.util.Util;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ArticleService {
 	
 	@Autowired
 	private ArticleDao articleDao;
+	
+	@Autowired
+	private SamFileService samFileService;
+	
+	@Autowired
+	private MemberService memberService;
 
 	
 //----------------------------------------------------------------------------------------------------  	
@@ -76,10 +85,12 @@ public class ArticleService {
 	
 //----------------------------------------------------------------------------------------------------  	
 	// 게시글 쓰기
-	public ResultData writeArticle(int boardId, int memberId, String title, String body) {
-		articleDao.writeArticle(boardId, memberId, title, body);
-		int id = articleDao.getLastInsertId();
+	public ResultData writeArticle(Map<String, Object> param) {
+		articleDao.writeArticle(param);
+		int id = Util.getAsInt(param.get("id"), 0);
 
+		samFileService.changeInputFileRelIds(param, id);
+		
 		return new ResultData("S-1", "게시물이 작성되었습니다.", "id", id);
 	}
 	

@@ -40,6 +40,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(beforeActionInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/resource/**")
+                .excludePathPatterns("/sam/**")
                 .excludePathPatterns("/error");
 
         // needToLoginInterceptor -> 로그인이 필요한 경우 
@@ -57,7 +58,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/usr/member/modify")
                 .addPathPatterns("/usr/member/doModify")
                 .addPathPatterns("/usr/member/checkPassword")
-                .addPathPatterns("/usr/member/doCheckPassword");
+                .addPathPatterns("/usr/member/doCheckPassword")
+                .excludePathPatterns("/resource/**")
+                .excludePathPatterns("/sam/**");
 
         // needToLogoutInterceptor -> 로그아웃이 필요한 경우
         registry.addInterceptor(needToLogoutInterceptor)
@@ -73,7 +76,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/usr/member/findLoginId")
                 .addPathPatterns("/usr/member/doFindLoginId")
                 .addPathPatterns("/usr/member/findLoginPw")
-                .addPathPatterns("/usr/member/doFindLoginPw");
+                .addPathPatterns("/usr/member/doFindLoginPw")
+                .excludePathPatterns("/resource/**")
+                .excludePathPatterns("/sam/**");
 
         // /adm/** 으로 시작하는 URI에 대해서 관리자인지 체크
         registry.addInterceptor(needAdminInterceptor)
@@ -90,7 +95,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/adm/member/findLoginId")
                 .excludePathPatterns("/adm/member/doFindLoginId")
                 .excludePathPatterns("/adm/member/findLoginPw")
-                .excludePathPatterns("/adm/member/doFindLoginPw");
+                .excludePathPatterns("/adm/member/doFindLoginPw")
+                .excludePathPatterns("/resource/**")
+                .excludePathPatterns("/sam/**");
 
         // needToLogoutInterceptor -> 중에서 로그아웃이 필요한 관리자페이지 
         registry.addInterceptor(needToLogoutInterceptor)
@@ -106,7 +113,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/adm/member/findLoginId")
                 .addPathPatterns("/adm/member/doFindLoginId")
                 .addPathPatterns("/adm/member/findLoginPw")
-                .addPathPatterns("/adm/member/doFindLoginPw");
+                .addPathPatterns("/adm/member/doFindLoginPw")
+                .excludePathPatterns("/resource/**")
+                .excludePathPatterns("/sam/**");
     }
 
     

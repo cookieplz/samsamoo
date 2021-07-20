@@ -2,10 +2,12 @@ package com.ezen.samsamoo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartRequest;
 
 import com.ezen.samsamoo.dto.*;
 import com.ezen.samsamoo.service.ArticleService;
@@ -96,31 +98,44 @@ public class UsrArticleController {
     // 게시물 상세보기
     @RequestMapping("/usr/article/detail")
     public String showDetail(HttpServletRequest req, int id) {
+    	Article article =articleService.getForPrintArticleById(id);
     	articleService.updateHitCountById(id);
+    	List<Reply> replies = replyService.getForPrintRepliesByRelTypeCodeAndRelId("article", id);
+    	if(article == null) {
+    		return Util.msgAndBack(req, id + "번 게시물이 존재하지 않습니다.");
+    	}
+    	
+    	Board board = articleService.getBoardById(article.getBoardId());
+    	
+    	List<SamFile> files = samFileService.getSamFiles("article", article.getId(), "common", "attachment");
+    	
+    	Map<String, SamFile> filesMap = new HashMap<>();
+    	for(SamFile file : files) {
+    		filesMap.put(file.getFileNo() + "", file);
+    	}
+       	
+    	article.getExtraNotNull().put("file__common__attachment", filesMap);
+    	req.setAttribute("article", article);
+    	req.setAttribute("replies", replies);
+    	req.setAttribute("board", board);
+    	
+    	return "usr/article/detail";
+    	
+    	/*
         Article article = articleService.getForPrintArticleById(id);
         List<Reply> replies = replyService.getForPrintRepliesByRelTypeCodeAndRelId("article", id);
 
         if (article == null) {
             return Util.msgAndBack(req, id + "번 게시물이 존재하지 않습니다.");
         }
+
         Board board = articleService.getBoardById(article.getBoardId());
 
-		List<SamFile> files = samFileService.getSamFiles("article", article.getId(), "common", "attachment");
-
-		Map<String, SamFile> filesMap = new HashMap<>();
-
-		for (SamFile file : files) {
-			filesMap.put(file.getFileNo() + "", file);
-		}	
-		article.getExtraNotNull().put("file__common__attachment", filesMap);
-		     
-      
+        req.setAttribute("replies", replies);
         req.setAttribute("article", article);
         req.setAttribute("board", board);
-        req.setAttribute("replies", replies);
-        req.setAttribute("samFile", files);
 
-        return "usr/article/detail";
+        return "adm/article/detail";	*/
     }
     
 //----------------------------------------------------------------------------------------------------     
@@ -141,27 +156,28 @@ public class UsrArticleController {
     
     // 게시물 작성하기
     @RequestMapping("/usr/article/doWrite")
-    public String doWrite(HttpServletRequest req, int boardId, String title, String body) {
-        if (Util.isEmpty(title)) {
-            return Util.msgAndBack(req, "제목을 입력해주세요.");
-        }
-
-        if (Util.isEmpty(body)) {
-            return Util.msgAndBack(req, "내용을 입력해주세요.");
-        }
-
+    public String doWrite(@RequestParam Map<String, Object> param, HttpServletRequest req, MultipartRequest multipartRequest) {
+    
         Rq rq = (Rq)req.getAttribute("rq");
 
         int memberId = rq.getLoginedMemberId();
+    
+        if (param.get("title") == null) {
+			return Util.msgAndBack(req, "title을 입력해주세요.");
+		}
 
-        ResultData writeArticleRd = articleService.writeArticle(boardId, memberId, title, body);
-
-        if (writeArticleRd.isFail()) {
-            return Util.msgAndBack(req, writeArticleRd.getMsg());
-        }
-
-        String replaceUri = "detail?id=" + writeArticleRd.getBody().get("id");
-        return Util.msgAndReplace(req, writeArticleRd.getMsg(), replaceUri);
+		if (param.get("body") == null) {
+			return Util.msgAndBack(req, "body를 입력해주세요.");
+		}
+		
+		param.put("memberId", memberId);
+		
+		ResultData writeArticleRd = articleService.writeArticle(param);
+		
+		int newArticleId = (int)writeArticleRd.getBody().get("id");
+        
+		return Util.msgAndReplace(req, String.format("%d번 게시물이 작성되었습니다.", newArticleId), "../article/detail?id=" + newArticleId);
+       
     }
  
 //----------------------------------------------------------------------------------------------------     

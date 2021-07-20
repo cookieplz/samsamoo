@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartRequest;
 
 import com.ezen.samsamoo.dto.*;
 import com.ezen.samsamoo.service.ArticleService;
@@ -13,6 +14,7 @@ import com.ezen.samsamoo.util.Util;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class AdmArticleController {
@@ -123,27 +125,28 @@ public class AdmArticleController {
   
     // 게시물 작성하기
     @RequestMapping("/adm/article/doWrite")
-    public String doWrite(HttpServletRequest req, int boardId, String title, String body) {
-        if (Util.isEmpty(title)) {
-            return Util.msgAndBack(req, "제목을 입력해주세요.");
-        }
-
-        if (Util.isEmpty(body)) {
-            return Util.msgAndBack(req, "내용을 입력해주세요.");
-        }
-
+    public String doWrite(@RequestParam Map<String, Object> param, HttpServletRequest req, MultipartRequest multipartRequest) {
+    
         Rq rq = (Rq)req.getAttribute("rq");
 
         int memberId = rq.getLoginedMemberId();
+    
+        if (param.get("title") == null) {
+			return Util.msgAndBack(req, "title을 입력해주세요.");
+		}
 
-        ResultData writeArticleRd = articleService.writeArticle(boardId, memberId, title, body);
-
-        if (writeArticleRd.isFail()) {
-            return Util.msgAndBack(req, writeArticleRd.getMsg());
-        }
-
-        String replaceUri = "detail?id=" + writeArticleRd.getBody().get("id");
-        return Util.msgAndReplace(req, writeArticleRd.getMsg(), replaceUri);
+		if (param.get("body") == null) {
+			return Util.msgAndBack(req, "body를 입력해주세요.");
+		}
+		
+		param.put("memberId", memberId);
+		
+		ResultData writeArticleRd = articleService.writeArticle(param);
+		
+		int newArticleId = (int)writeArticleRd.getBody().get("id");
+        
+		return Util.msgAndReplace(req, String.format("%d번 게시물이 작성되었습니다.", newArticleId), "../article/detail?id=" + newArticleId);
+       
     }
 
     

@@ -7,6 +7,7 @@ import com.ezen.samsamoo.dto.Article;
 import com.ezen.samsamoo.dto.Board;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ArticleDao {
@@ -30,8 +31,7 @@ public interface ArticleDao {
             @Param("limitFrom") int limitFrom, @Param("limitTake") int limitTake);
     
     // 게시글 쓰기
-    public void writeArticle(@Param("boardId") int boardId, @Param("memberId") int memberId, @Param("title") String title,
-                      @Param("body") String body);  
+    public void writeArticle(Map<String, Object> param);
     
     // 게시글 수정하기
     public boolean modifyArticle(@Param("id") int id, @Param("title") String title, @Param("body") String body);
