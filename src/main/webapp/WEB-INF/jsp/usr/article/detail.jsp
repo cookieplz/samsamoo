@@ -151,7 +151,7 @@ function ReplyModify__submitForm(form) {
 
 					<!-- 게시글 내용 -->
 
-					<div class="text-gray-400 font-medium text-sm mb-7 mt-6">
+					<div class="text-gray-400 w-96 mx-auto font-medium text-sm mb-7 mt-6" >
 						<c:forEach begin="1" end ="${fileInputMaxCount}" var="inputNo">
 							<c:set var="fileNo" value="${String.valueOf(inputNo)}" />
 							<c:set var="file" value="${article.extra.file__common__attachment[fileNo]}"/>
@@ -159,23 +159,18 @@ function ReplyModify__submitForm(form) {
 						</c:forEach>
 					</div>
 					<div class="text-gray-600 font-semibold text-lg mb-2">${article.title }</div>
-					<div class="gext-gray-500 font-thin text-sm mb-6">${article.body }</div>
-					<!--  
-					<div class="body-container mx-auto mt-6">
-						<div class="mt-3">
-							<c:forEach begin="1" end="${fileInputMaxCount}" var="inputNo">
-								<c:set var="fileNo" value="${String.valueOf(inputNo)}" />
-								<c:set var="file" value="${article.extra.file__common__attachment[fileNo]}" />
-								${file.mediaHtml}
-							</c:forEach>
-						</div>
-						<div class="mt-3">${article.bodyForPrint}</div>
-					</div>
-					-->
-					
-					
-					
+					<div class="gext-gray-500 font-thin text-sm mb-6">${article.body }</div>	
 				</div>
+			</div>
+
+			<div class="plain-link-wrap gap-3 mt-4">
+				<a href="modify?id=${article.id}" class="ml-2 text-blue-500 hover:underline">수정</a>
+				 <a onclick="if ( !confirm('삭제하시겠습니까?') ) return false;" href="doDelete?id=${article.id}" class="ml-2 text-blue-500 hover:underline"> 
+				 	<span>
+						<i class="fas fa-trash"></i>
+						 <span>삭제</span>
+					</span>
+				</a>
 			</div>
 
 			<!-- 댓글 수정 모달~(히든 속성)-->
@@ -209,7 +204,6 @@ function ReplyModify__submitForm(form) {
 					</div>
 				</div>
 			</div>
-
 			<hr>
 			<div>
 				<h1 class="title-bar-type-2 px-4 mt-6">댓글</h1>

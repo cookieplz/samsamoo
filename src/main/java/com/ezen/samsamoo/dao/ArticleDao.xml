@@ -87,6 +87,7 @@
                 AND A.body LIKE CONCAT('%', #{searchKeyword}, '%')
             </if>
         </if>
+        AND A.delStatus = 0
         ORDER BY A.id DESC
         LIMIT #{limitFrom}, #{limitTake};
     </select>

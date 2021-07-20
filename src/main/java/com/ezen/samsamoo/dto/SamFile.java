@@ -69,7 +69,7 @@ public class SamFile {
     
     // 이미지 파일을 html에 삽입하기 위한 메서드 
     public String getMediaHtml() {
-        return "<img src=\"" + getForPrintUrl() + "\">";
+        return "<img src=\"" + getForPrintUrl() +  "onError=\"this.style.display = 'none';\" alt=\"\" \">";
     }
     
 }
