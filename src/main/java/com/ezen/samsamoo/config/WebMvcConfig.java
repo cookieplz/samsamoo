@@ -1,8 +1,10 @@
 package com.ezen.samsamoo.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -15,8 +17,8 @@ import com.ezen.samsamoo.interceptor.NeedToLogoutInterceptor;
 // WebMvcConfig에다가 설정을 하면은 여기에 있는 설정을 스프링 부트가 읽는다.
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
-    	
-    @Autowired
+	
+	@Autowired
     BeforeActionInterceptor beforeActionInterceptor;
 
     @Autowired
@@ -28,11 +30,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     NeedToLogoutInterceptor needToLogoutInterceptor;
 
-    // application.yml(프로퍼티스) 설정파일 내에 텍스트 값을 변수로 받고싶을 때 사용하는 어노테이션
-    @Value("${custom.samFileDirPath}")	
-    private String samFileDirPath;
 
-    
+	    @Value("${custom.samFileDirPath}")	
+		private String samFileDirPath;
+	    
+		//CORS 허용
+		@Override
+		public void addCorsMappings(CorsRegistry registry) {
+			 registry.addMapping("/**");
+		}
+	    
     // 인터셉터를 적용하는 역할을 담당
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -43,7 +50,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/sam/**")
                 .excludePathPatterns("/error");
 
-        // needToLoginInterceptor -> 로그인이 필요한 경우 
+        // 로그인이 필요한 경우 
         registry.addInterceptor(needToLoginInterceptor)
                 .addPathPatterns("/usr/article/write")
                 .addPathPatterns("/usr/article/doWrite")
@@ -62,7 +69,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/resource/**")
                 .excludePathPatterns("/sam/**");
 
-        // needToLogoutInterceptor -> 로그아웃이 필요한 경우
+        // 로그아웃이 필요한 경우
         registry.addInterceptor(needToLogoutInterceptor)
                 .addPathPatterns("/usr/member/findLoginId")
                 .addPathPatterns("/usr/member/doFindLoginId")
@@ -80,7 +87,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/resource/**")
                 .excludePathPatterns("/sam/**");
 
-        // /adm/** 으로 시작하는 URI에 대해서 관리자인지 체크
+        // 어드민 필요
         registry.addInterceptor(needAdminInterceptor)
                 .addPathPatterns("/adm/**")
                 .excludePathPatterns("/adm/member/findLoginId")
@@ -99,7 +106,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/resource/**")
                 .excludePathPatterns("/sam/**");
 
-        // needToLogoutInterceptor -> 중에서 로그아웃이 필요한 관리자페이지 
         registry.addInterceptor(needToLogoutInterceptor)
                 .addPathPatterns("/adm/member/findLoginId")
                 .addPathPatterns("/adm/member/doFindLoginId")

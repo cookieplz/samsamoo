@@ -106,13 +106,21 @@
 
 
 <!-- 게시글 수정하기 -->
- <update id="modifyArticle">
-        UPDATE article
-        SET updateDate = NOW(),
-        title = #{title},
-        body = #{body}
-        WHERE id = #{id}
-    </update>
+	<update id="modifyArticle">
+		UPDATE article
+		<set>
+			<if test="title != null or body != null">
+				updateDate = NOW(),
+			</if>
+			<if test="title != null">
+				title = #{title},
+			</if>
+			<if test="body != null">
+				`body` = #{body}
+			</if>
+		</set>
+			WHERE id = #{id} 
+	</update>		
 
 
 <!-- 게시글 삭제하기  -->

@@ -1,17 +1,17 @@
 package com.ezen.samsamoo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ezen.samsamoo.dao.ArticleDao;
 import com.ezen.samsamoo.dto.Article;
 import com.ezen.samsamoo.dto.Board;
+import com.ezen.samsamoo.dto.Member;
 import com.ezen.samsamoo.dto.ResultData;
 import com.ezen.samsamoo.util.Util;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class ArticleService {
@@ -95,20 +95,6 @@ public class ArticleService {
 	}
 	
 	
-	// 게시글 수정하기
-	public ResultData modifyArticle(int id, String title, String body) {
-		Article article = getArticleById(id);
-
-		if (isEmpty(article)) {
-			return new ResultData("F-1", "존재하지 않는 게시물 번호입니다.", "id", id);
-		}
-
-		articleDao.modifyArticle(id, title, body);
-
-		return new ResultData("S-1", "게시물이 수정되었습니다.", "id", id);
-	}
-
-	
 	// 게시글 삭제하기
 	public ResultData deleteArticleById(int id) {
 		Article article = getArticleById(id);
@@ -156,5 +142,32 @@ public class ArticleService {
 			return new ResultData("S-1", "싫어요가 증가되었습니다.", "id", id);
 		}
 	
+//---------------------------------------------------------------------		
+		// 게시글 수정하기
+		public ResultData modifyArticle(Map<String, Object> param) {
+			articleDao.modifyArticle(param);
 
+			int id = Util.getAsInt(param.get("id"), 0);
+
+			return new ResultData("S-1", "게시물을 수정하였습니다.", "id", id);
+
+		}
+
+
+		//게시물 수정시 권한 체크
+		public ResultData getActorCanModifyRd(Article article, Member member) {
+			if(article.getMemberId() == member.getId()) {
+				return new ResultData("S-1", "가능합니다.");
+			}
+			if(memberService.isAdmin(member)) {
+				return new ResultData("S-1", "가능합니다.");
+			}
+			return new ResultData("F-1", "권한이 없습니다.");
+		}
+
+
+		//게시글 삭제시 권한 체크
+		public ResultData getActorCanDeleteRd(Article article, Member member) {
+			return getActorCanModifyRd(article, member);	// 어차피 삭제권한이나 수정권한이나 비슷해서 재활용 개꿀
+		}
 }

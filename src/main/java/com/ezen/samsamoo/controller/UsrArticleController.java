@@ -14,8 +14,6 @@ import com.ezen.samsamoo.service.ArticleService;
 import com.ezen.samsamoo.service.ReplyService;
 import com.ezen.samsamoo.service.SamFileService;
 import com.ezen.samsamoo.util.Util;
-
-
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
@@ -201,31 +199,65 @@ public class UsrArticleController {
     }
     
 //----------------------------------------------------------------------------------------------------     
-    // 게시물 수정하기
-    @RequestMapping("/usr/article/doModify")
-    @ResponseBody
-    public ResultData doModify(Integer id, String title, String body) {
-
-        if (Util.isEmpty(id)) {
-            return new ResultData("F-1", "번호를 입력해주세요.");
-        }
-
-        if (Util.isEmpty(title)) {
-            return new ResultData("F-2", "제목을 입력해주세요.");
-        }
-
-        if (Util.isEmpty(body)) {
-            return new ResultData("F-3", "내용을 입력해주세요.");
-        }
-
-        Article article = articleService.getArticleById(id);
-
-        if (article == null) {
-            return new ResultData("F-4", "존재하지 않는 게시물 번호입니다.");
-        }
-
-        return articleService.modifyArticle(id, title, body);
-    }
-
+	// 게시글 수정 페이지로 보내기
+   @RequestMapping("/usr/article/modify")
+   public String showModify(HttpServletRequest req, int id, String redirectUri) {
+	   Article article = articleService.getArticleById(id);
+	   
+	   List<SamFile> files = samFileService.getSamFiles("article", article.getId(), "common", "attachment");
+	   
+	   Map<String, SamFile> filesMap = new HashMap<>();
+	   
+	   for(SamFile file : files) {
+		   filesMap.put(file.getFileNo() + "", file);
+	   }
+	   
+	   article.getExtraNotNull().put("file__common__attachment", filesMap);
+		req.setAttribute("article", article);
+	   
+	   if(article == null) {
+		   return Util.msgAndBack(req, "존재하지 않는 댓글입니다.");
+	   }
+	   
+	   Rq rq = (Rq)req.getAttribute("rq");
+	   
+	   if(article.getMemberId() != rq.getLoginedMemberId()) {
+		   return Util.msgAndBack(req, "권한이 없습니다.");
+	   }
+	   
+	   return "usr/article/modify";
+   }
+	
+    
+    // 게시글 수정하기
+	@RequestMapping("/usr/article/doModify")
+	@ResponseBody
+	public String doMoify(HttpServletRequest req, @RequestParam Map<String, Object> param, String redirectUri) {
+		int id = Util.getAsInt(param.get("id"), 0);
+		Article article = articleService.getArticleById(id);
+		
+		if(article == null) {
+			return Util.msgAndBack(req, "존재하지 않는 게시글입니다.");
+		}
+		
+		Rq rq = (Rq)req.getAttribute("rq");
+		
+		if(article.getMemberId() != rq.getLoginedMemberId()) {
+			return Util.msgAndBack(req, "권한이 없습니다.");
+		}
+		
+		/*
+		 * 		ResultData writeArticleRd = articleService.writeArticle(param);
+		
+		int newArticleId = (int)writeArticleRd.getBody().get("id");
+        
+		return Util.msgAndReplace(req, String.format("%d번 게시물이 작성되었습니다.", newArticleId), "../article/detail?id=" + newArticleId);
+		 */
+		ResultData modifyArticleRd = articleService.modifyArticle(param);
+		int newArticleId = (int)modifyArticleRd.getBody().get("id");
+	
+		
+	      return  Util.msgAndReplace(req, "씨발", redirectUri);
+	}
    
 }

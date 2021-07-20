@@ -10,14 +10,16 @@ import com.ezen.samsamoo.util.Util;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-// 로그인 되어있는지 체크하는 인터셉터
 @Component
 public class NeedToLoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
         Rq rq = (Rq) req.getAttribute("rq");
 
-        // 로그인 되어있지 않으면 false를 리턴
+        // isAjax=Y
+        // doDeleteAjax
+        // get
+
         if (rq.isNotLogined()) {
             String resultCode = "F-A";
             String resultMsg = "로그인 후 이용해주세요.";

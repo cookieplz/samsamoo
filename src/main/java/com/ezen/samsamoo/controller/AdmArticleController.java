@@ -1,5 +1,11 @@
 package com.ezen.samsamoo.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,14 +13,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartRequest;
 
-import com.ezen.samsamoo.dto.*;
+import com.ezen.samsamoo.dto.Article;
+import com.ezen.samsamoo.dto.Board;
+import com.ezen.samsamoo.dto.Member;
+import com.ezen.samsamoo.dto.Reply;
+import com.ezen.samsamoo.dto.ResultData;
+import com.ezen.samsamoo.dto.Rq;
+import com.ezen.samsamoo.dto.SamFile;
 import com.ezen.samsamoo.service.ArticleService;
 import com.ezen.samsamoo.service.ReplyService;
+import com.ezen.samsamoo.service.SamFileService;
 import com.ezen.samsamoo.util.Util;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 public class AdmArticleController {
@@ -25,6 +34,8 @@ public class AdmArticleController {
     @Autowired
     private ReplyService replyService;
     
+    @Autowired
+    private SamFileService samFileService;
     
 //----------------------------------------------------------------------------------------------------  
     // 게시물 하나의 정보를 얻어오기
@@ -151,31 +162,66 @@ public class AdmArticleController {
 
     
  //----------------------------------------------------------------------------------------------------    
-    // 게시물 수정하기
-    @RequestMapping("/adm/article/doModify")
-    @ResponseBody
-    public ResultData doModify(Integer id, String title, String body) {
+    @RequestMapping("/adm/article/modify")
+	public String showModify(Integer id, HttpServletRequest req) {
+		if (id == null) {
+			return Util.msgAndBack(req, "id를 입력해주세요.");
+		}
 
-        if (Util.isEmpty(id)) {
-            return new ResultData("F-1", "번호를 입력해주세요.");
-        }
+		Article article = articleService.getForPrintArticleById(id);
 
-        if (Util.isEmpty(title)) {
-            return new ResultData("F-2", "제목을 입력해주세요.");
-        }
+		List<SamFile> files = samFileService.getSamFiles("article", article.getId(), "common", "attachment");
 
-        if (Util.isEmpty(body)) {
-            return new ResultData("F-3", "내용을 입력해주세요.");
-        }
+		Map<String, SamFile> filesMap = new HashMap<>();
 
-        Article article = articleService.getArticleById(id);
+		for (SamFile file : files) {
+			filesMap.put(file.getFileNo() + "", file);
+		}
 
-        if (article == null) {
-            return new ResultData("F-4", "존재하지 않는 게시물 번호입니다.");
-        }
+		article.getExtraNotNull().put("file__common__attachment", filesMap);
+		req.setAttribute("article", article);
 
-        return articleService.modifyArticle(id, title, body);
-    }
+		if (article == null) {
+			return Util.msgAndBack(req, "존재하지 않는 게시물번호 입니다.");
+		}
+
+		return "adm/article/modify";
+	}
+	
+
+	@RequestMapping("/adm/article/doModify")
+	@ResponseBody
+	public ResultData doModify(@RequestParam Map<String, Object> param, HttpServletRequest req) {
+		Member loginedMember = (Member) req.getAttribute("loginedMember");
+		
+		int id = Util.getAsInt(param.get("id"), 0);
+
+		if ( id == 0 ) {
+			return new ResultData("F-1", "id를 입력해주세요.");
+		}
+
+		if ( Util.isEmpty(param.get("title")) ) {
+			return new ResultData("F-1", "title을 입력해주세요.");
+		}
+
+		if ( Util.isEmpty(param.get("body")) ) {
+			return new ResultData("F-1", "body를 입력해주세요.");
+		}
+
+		Article article = articleService.getArticleById(id);
+
+		if (article == null) {
+			return new ResultData("F-1", "해당 게시물은 존재하지 않습니다.");
+		}
+
+		ResultData actorCanModifyRd = articleService.getActorCanModifyRd(article, loginedMember);
+
+		if (actorCanModifyRd.isFail()) {
+			return actorCanModifyRd;
+		}
+
+		return articleService.modifyArticle(param);
+	}
 
     
 //----------------------------------------------------------------------------------------------------     

@@ -34,7 +34,7 @@ public interface ArticleDao {
     public void writeArticle(Map<String, Object> param);
     
     // 게시글 수정하기
-    public boolean modifyArticle(@Param("id") int id, @Param("title") String title, @Param("body") String body);
+    public void modifyArticle(Map<String, Object> param);
 
     // 게시글 삭제하기 
     public void deleteArticleById(@Param("id") int id);
